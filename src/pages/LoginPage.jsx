@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { signInWithPin } from "../api/auth";
 import { BrandFooter } from "../components/layout/BrandFooter";
-import { API_BASE, ROUTES, TOKEN_KEY } from "../config/routes";
+import { ROUTES, TOKEN_KEY } from "../config/routes";
 
 export function LoginPage() {
   const [digits, setDigits] = useState(["", "", "", ""]);
@@ -21,13 +22,7 @@ export function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE}/api/auth/pin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(typeof payload.detail === "string" ? payload.detail : `Sign-in failed (${response.status})`);
+      const payload = await signInWithPin(pin);
       localStorage.setItem(TOKEN_KEY, payload.access_token || pin);
       location.replace(ROUTES.dashboard);
     } catch (err) {
