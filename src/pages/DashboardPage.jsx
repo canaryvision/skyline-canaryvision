@@ -14,10 +14,10 @@ export function DashboardPage() {
   const overview = mockApi.overview();
 
   return (
-    <Shell page="dashboard" title="Security & Surveillance Overview" eyebrow="River Valley Skyline">
+    <Shell page="dashboard" title="Security & Surveillance Overview" eyebrow="Skyline Riverville">
       <div className="hero-strip">
         <div>
-          <h2>River Valley Skyline</h2>
+          <h2>Skyline Riverville</h2>
           <p>Residential perimeter, vehicle, and security personnel monitoring.</p>
         </div>
         <StatusPill>System Operational</StatusPill>

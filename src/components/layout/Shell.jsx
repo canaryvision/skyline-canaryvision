@@ -6,10 +6,11 @@ import { StatusPill } from "../ui/StatusPill";
 
 export function Shell({ page, title, eyebrow, children }) {
   const [navOpen, setNavOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem("skylineSidebarCollapsed") === "true");
   const now = useClock();
 
   useEffect(() => {
-    document.title = `${title} - River Valley Skyline`;
+    document.title = `${title} - Skyline Riverville`;
   }, [title]);
 
   const signOut = () => {
@@ -17,22 +18,29 @@ export function Shell({ page, title, eyebrow, children }) {
     location.replace(ROUTES.home);
   };
 
+  const toggleCollapsed = () => {
+    setCollapsed((value) => {
+      localStorage.setItem("skylineSidebarCollapsed", String(!value));
+      return !value;
+    });
+  };
+
   return (
-    <div className="app-shell">
-      <aside className={`sidebar ${navOpen ? "open" : ""}`}>
-        <a className="side-brand" href={ROUTES.dashboard}>
+    <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""}`}>
+      <aside className={`sidebar ${navOpen ? "open" : ""} ${collapsed ? "collapsed" : ""}`} onClick={(event) => event.currentTarget === event.target && toggleCollapsed()}>
+        <a className="side-brand" href={ROUTES.dashboard} onClick={(event) => event.stopPropagation()}>
           <img src="/cv_mark.png" alt="" />
-          <span><strong>River Valley Skyline</strong><small>Security Operations</small></span>
+          <span><strong>Skyline Riverville</strong><small>Security Operations</small></span>
         </a>
-        <nav className="side-nav">
+        <nav className="side-nav" onClick={(event) => event.stopPropagation()}>
           {NAV_ITEMS.map(([key, href, label, icon]) => (
-            <a key={key} className={`nav-link ${page === key ? "active" : ""}`} href={href} onClick={() => setNavOpen(false)}>
+            <a key={key} className={`nav-link ${page === key ? "active" : ""}`} href={href} data-label={label} title={collapsed ? label : ""} onClick={() => setNavOpen(false)}>
               <Icon name={icon} />
               <span>{label}</span>
             </a>
           ))}
         </nav>
-        <div className="side-status">
+        <div className="side-status" onClick={(event) => event.stopPropagation()}>
           <StatusPill>System Operational</StatusPill>
           <span>All core services online</span>
         </div>

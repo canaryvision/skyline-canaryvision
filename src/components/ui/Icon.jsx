@@ -9,6 +9,8 @@ const paths = {
   menu: "M4 7h16 M4 12h16 M4 17h16",
   close: "M6 6l12 12 M18 6L6 18",
   logout: "M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4 M14 8l4 4-4 4 M18 12H9",
+  collapse: "M4 4h16v16H4z M14 8l-4 4 4 4",
+  expand: "M4 4h16v16H4z M10 8l4 4-4 4",
 };
 
 export function Icon({ name }) {

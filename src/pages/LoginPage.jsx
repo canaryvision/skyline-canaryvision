@@ -11,7 +11,7 @@ export function LoginPage() {
 
   useEffect(() => {
     localStorage.removeItem(TOKEN_KEY);
-    document.title = "River Valley Skyline";
+    document.title = "Skyline Riverville";
     inputs.current[0]?.focus();
   }, []);
 
@@ -46,10 +46,10 @@ export function LoginPage() {
       <img className="brand-art" src="/cham-1.png" alt="" />
       <header className="brand-lockup">
         <img src="/cv_mark.png" alt="" />
-        <span className="brand-word">river valley<br />skyline</span>
+        <span className="brand-word">skyline<br />riverville</span>
       </header>
       <main className="signin-panel">
-        <h1 className="signin-title">River Valley Skyline</h1>
+        <h1 className="signin-title">Skyline Riverville</h1>
         <div className="signin-heading">
           <p className="signin-tenant">SECURITY CONTROL</p>
           <p className="signin-sub">Access Control</p>
