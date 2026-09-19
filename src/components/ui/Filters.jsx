@@ -1,7 +1,6 @@
-import { cameraList } from "../../data/mockData";
 import { Icon } from "./Icon";
 
-export function Filters({ search, setSearch, status, setStatus, camera, setCamera, extra }) {
+export function Filters({ search, setSearch, status, setStatus, camera, setCamera, cameraOptions = [], extra }) {
   return (
     <div className="filters">
       <label className="search-field">
@@ -12,7 +11,11 @@ export function Filters({ search, setSearch, status, setStatus, camera, setCamer
       {setCamera ? (
         <select value={camera} onChange={(event) => setCamera(event.target.value)} aria-label="Camera filter">
           <option value="">All cameras</option>
-          {cameraList.map((item) => <option key={item.id} value={item.name}>{item.name}</option>)}
+          {cameraOptions.map((item) => (
+            <option key={item.id || item.name} value={item.name}>
+              {item.name}
+            </option>
+          ))}
         </select>
       ) : null}
       <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Status filter">

@@ -1,21 +1,24 @@
-import { intrusionEvents, securityActivity, unifiedEvents, vehicleHistory, vehiclesInside } from "../data/mockData";
+import { parseVehicleDocument } from "../services/firestoreVehicles";
 
+// Pure Firebase API interface - dummy data removed
 export const mockApi = {
   overview() {
     return {
-      camerasOnline: "12 / 12",
-      lastUpdated: "10:54 AM",
-      activeIntrusions: intrusionEvents.filter((event) => event.status === "Active").length,
-      vehiclesInside: vehiclesInside.length,
-      todayEntries: 38,
-      todayExits: 31,
-      nonListed: vehicleHistory.filter((vehicle) => !vehicle.listed).length,
-      securityDetected: 3,
+      camerasOnline: "0 / 0",
+      lastUpdated: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      activeIntrusions: 0,
+      vehiclesInside: 0,
+      todayEntries: 0,
+      todayExits: 0,
+      nonListed: 0,
+      securityDetected: 0,
     };
   },
-  intrusionEvents: () => intrusionEvents,
-  vehicleHistory: () => vehicleHistory,
-  vehiclesInside: () => vehiclesInside,
-  securityActivity: () => securityActivity,
-  unifiedEvents: () => unifiedEvents,
+  intrusionEvents: () => [],
+  vehicleHistory: () => [],
+  vehiclesInside: () => [],
+  securityActivity: () => [],
+  unifiedEvents: () => [],
 };
+
+export { parseVehicleDocument };

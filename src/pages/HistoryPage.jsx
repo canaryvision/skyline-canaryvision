@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { mockApi } from "../api/mockApi";
+import { useFirebaseData } from "../hooks/useFirebaseData";
 import { Shell } from "../components/layout/Shell";
 import { UnifiedFeed } from "../components/lists/UnifiedFeed";
 import { Icon } from "../components/ui/Icon";
@@ -8,7 +8,9 @@ import { Section } from "../components/ui/Section";
 export function HistoryPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-  const events = mockApi.unifiedEvents().filter((event) => {
+  const { unifiedEvents } = useFirebaseData();
+
+  const events = unifiedEvents.filter((event) => {
     const text = `${event.type} ${event.location} ${event.status}`.toLowerCase();
     return (!search || text.includes(search.toLowerCase())) && (!status || event.status === status);
   });

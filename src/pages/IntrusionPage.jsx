@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { mockApi } from "../api/mockApi";
+import { useFirebaseData } from "../hooks/useFirebaseData";
 import { Shell } from "../components/layout/Shell";
 import { Icon } from "../components/ui/Icon";
 import { Filters } from "../components/ui/Filters";
@@ -7,15 +7,17 @@ import { Metric } from "../components/ui/Metric";
 import { Section } from "../components/ui/Section";
 import { Snapshot } from "../components/ui/Snapshot";
 import { StatusPill } from "../components/ui/StatusPill";
-import { cameraList, intrusionEvents } from "../data/mockData";
 
 export function IntrusionPage() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [camera, setCamera] = useState("");
-  const active = intrusionEvents[0];
-  const events = mockApi.intrusionEvents().filter((event) => {
+
+  const { intrusions, cameras, activeIntrusions } = useFirebaseData();
+
+  const active = intrusions.find((i) => i.status === "Active") || intrusions[0];
+  const events = intrusions.filter((event) => {
     const term = `${event.camera} ${event.zone} ${event.status}`.toLowerCase();
     return (!search || term.includes(search.toLowerCase())) && (!status || event.status === status) && (!camera || event.camera === camera);
   });
@@ -24,13 +26,13 @@ export function IntrusionPage() {
     <Shell page="intrusion" title="Intrusion Detection" eyebrow="Monitor unauthorized movement across designated zones">
       <div className="summary-strip">
         <Metric label="Monitoring status" value="Active" />
-        <Metric label="Monitoring schedule" value="9:00 PM - 5:00 AM" />
-        <Metric label="Cameras monitored" value="4" />
-        <Metric label="Active alerts" value="1" />
+        <Metric label="Monitoring schedule" value="24 / 7 Live" />
+        <Metric label="Cameras monitored" value={cameras.length || 0} />
+        <Metric label="Active alerts" value={activeIntrusions} />
       </div>
 
       <div className="camera-grid">
-        {cameraList.map((cameraItem) => (
+        {cameras.map((cameraItem) => (
           <article key={cameraItem.id} className="camera-card">
             <header>
               <div><strong>{cameraItem.name}</strong><span>{cameraItem.id} - {cameraItem.location}</span></div>
@@ -45,28 +47,30 @@ export function IntrusionPage() {
         ))}
       </div>
 
-      <Section title="Active Intrusion Alert" meta="Operator review">
-        <article className="alert-card">
-          <Snapshot label="Intrusion snapshot" tone="danger" />
-          <div>
-            <h3>Intrusion Detected</h3>
-            <p>Camera: {active.camera}</p>
-            <p>Zone: {active.zone}</p>
-            <p>Time: {active.time}</p>
-            <p>Severity: {active.severity}</p>
-          </div>
-          <StatusPill tone="danger">{active.status}</StatusPill>
-          <button className="btn" type="button" onClick={() => setSelected(active)}>View Details</button>
-        </article>
-      </Section>
+      {active ? (
+        <Section title="Active Intrusion Alert" meta="Operator review">
+          <article className="alert-card">
+            <Snapshot label="Intrusion snapshot" tone="danger" />
+            <div>
+              <h3>Intrusion Detected</h3>
+              <p>Camera: {active.camera}</p>
+              <p>Zone: {active.zone}</p>
+              <p>Time: {active.time}</p>
+              <p>Severity: {active.severity}</p>
+            </div>
+            <StatusPill tone="danger">{active.status}</StatusPill>
+            <button className="btn" type="button" onClick={() => setSelected(active)}>View Details</button>
+          </article>
+        </Section>
+      ) : null}
 
       <Section title="Intrusion History" meta={`${events.length} events`}>
-        <Filters search={search} setSearch={setSearch} status={status} setStatus={setStatus} camera={camera} setCamera={setCamera} />
+        <Filters search={search} setSearch={setSearch} status={status} setStatus={setStatus} camera={camera} setCamera={setCamera} cameraOptions={cameras} />
         <div className="table intrusion-table">
           <div className="tr th"><span>Snapshot</span><span>Date</span><span>Time</span><span>Camera</span><span>Location / Zone</span><span>Status</span><span>Action</span></div>
           {events.map((event) => (
             <button key={event.id} className="tr" type="button" onClick={() => setSelected(event)}>
-              <Snapshot label={event.cameraId} tone={event.status === "Active" ? "danger" : "neutral"} />
+              <Snapshot label={event.cameraId || "CAM"} tone={event.status === "Active" ? "danger" : "neutral"} />
               <span>{event.date}</span><span>{event.time}</span><span>{event.camera}</span><span>{event.zone}</span>
               <StatusPill tone={event.status === "Active" ? "danger" : "ok"}>{event.status}</StatusPill>
               <span className="linkish">View</span>

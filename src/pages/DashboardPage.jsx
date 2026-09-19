@@ -1,4 +1,4 @@
-import { mockApi } from "../api/mockApi";
+import { useFirebaseData } from "../hooks/useFirebaseData";
 import { Shell } from "../components/layout/Shell";
 import { ActivityList } from "../components/lists/ActivityList";
 import { EventMiniList } from "../components/lists/EventMiniList";
@@ -8,17 +8,29 @@ import { Metric } from "../components/ui/Metric";
 import { Section } from "../components/ui/Section";
 import { StatusPill } from "../components/ui/StatusPill";
 import { ROUTES } from "../config/routes";
-import { vehicleHistory } from "../data/mockData";
 
 export function DashboardPage() {
-  const overview = mockApi.overview();
+  const { overview, vehicles, intrusions, security, unifiedEvents } = useFirebaseData();
 
   return (
     <Shell page="dashboard" title="Security & Surveillance Overview" eyebrow="Skyline Riverville">
+      <div className="firebase-status-banner">
+        <div className="firebase-badge">
+          <span className="live-dot" />
+          <strong>Firebase Firestore Realtime Feed</strong>
+        </div>
+        <div className="firebase-meta">
+          <span>Project: <code>canaryvision-poc</code></span>
+          <span>Collection: <code>Vehicle</code></span>
+          <span>Live Documents: <strong>{vehicles.length}</strong></span>
+          <span>Status: <strong className="green-text">Active Stream</strong></span>
+        </div>
+      </div>
+
       <div className="hero-strip">
         <div>
           <h2>Skyline Riverville</h2>
-          <p>Residential perimeter, vehicle, and security personnel monitoring.</p>
+          <p>Residential perimeter, vehicle, and security personnel monitoring powered by Firebase.</p>
         </div>
         <StatusPill>System Operational</StatusPill>
         <div className="hero-meta"><span>Cameras Online</span><strong>{overview.camerasOnline}</strong></div>
@@ -35,34 +47,34 @@ export function DashboardPage() {
       </div>
 
       <div className="dashboard-grid">
-        <Section title="Intrusion Summary" meta="9:00 PM - 5:00 AM">
+        <Section title="Intrusion Summary" meta="Perimeter status">
           <div className="status-row">
-            <StatusPill>Monitoring Active</StatusPill>
-            <span>4 monitored cameras</span>
-            <span>Current status: Active alert</span>
+            <StatusPill tone={overview.activeIntrusions > 0 ? "danger" : "ok"}>
+              {overview.activeIntrusions > 0 ? "Monitoring Active - Alert" : "Monitoring Active - Clear"}
+            </StatusPill>
+            <span>Live Firestore</span>
           </div>
-          <EventMiniList items={mockApi.intrusionEvents().slice(0, 3)} kind="intrusion" />
+          <EventMiniList items={intrusions.slice(0, 3)} kind="intrusion" />
         </Section>
         <Section title="Vehicle Summary" meta="Today">
           <div className="metric-list">
             <Metric label="Vehicles currently inside" value={overview.vehiclesInside} />
             <Metric label="Today's entries" value={overview.todayEntries} />
             <Metric label="Today's exits" value={overview.todayExits} />
-            <Metric label="Listed vehicles" value="126" />
             <Metric label="Non-listed vehicles" value={overview.nonListed} />
           </div>
-          <ActivityList items={vehicleHistory.slice(0, 3)} />
+          <ActivityList items={vehicles.slice(0, 3)} />
         </Section>
         <Section title="Security Summary" meta="Personnel detection">
           <div className="security-current">
-            <strong>Current security presence: 3 guards</strong>
-            <span>Last detected location: Main Gate</span>
-            <span>Last detection time: 10:48 AM</span>
+            <strong>Current security presence: {security.length} guard(s)</strong>
+            <span>Last detected location: {security[0]?.location || "Main Gate"}</span>
+            <span>Last detection time: {security[0]?.time || "Live"}</span>
           </div>
-          <EventMiniList items={mockApi.securityActivity().slice(0, 3)} kind="security" />
+          <EventMiniList items={security.slice(0, 3)} kind="security" />
         </Section>
         <Section title="Recent Events" meta="Unified feed">
-          <UnifiedFeed events={mockApi.unifiedEvents().slice(0, 5)} />
+          <UnifiedFeed events={unifiedEvents.slice(0, 5)} />
         </Section>
       </div>
     </Shell>
