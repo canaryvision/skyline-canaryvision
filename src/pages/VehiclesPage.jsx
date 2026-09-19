@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useFirebaseData } from "../hooks/useFirebaseData";
 import { Shell } from "../components/layout/Shell";
 import { Icon } from "../components/ui/Icon";
-import { Filters } from "../components/ui/Filters";
 import { KpiCard } from "../components/ui/KpiCard";
 import { Section } from "../components/ui/Section";
 import { Snapshot } from "../components/ui/Snapshot";
@@ -10,17 +9,8 @@ import { StatusPill } from "../components/ui/StatusPill";
 
 export function VehiclesPage() {
   const [selected, setSelected] = useState(null);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
-  const [listed, setListed] = useState("");
 
-  const { vehicles, vehiclesInside, todayEntries, todayExits, nonListedVehicles, cameras, loading } = useFirebaseData();
-
-  const records = vehicles.filter((item) => {
-    const term = `${item.plate} ${item.vehicle} ${item.camera}`.toLowerCase();
-    const listedMatch = !listed || (listed === "listed" ? item.listed : !item.listed);
-    return (!search || term.includes(search.toLowerCase())) && (!status || item.status === status) && listedMatch;
-  });
+  const { vehicles, vehiclesInside, todayEntries, todayExits, nonListedVehicles } = useFirebaseData();
 
   return (
     <Shell page="vehicles" title="Vehicle Monitoring" eyebrow="Live Firebase Firestore Vehicle Detections">
@@ -74,57 +64,6 @@ export function VehiclesPage() {
                 <span>{item.camera}</span>
                 <Snapshot label="Vehicle" tone={item.listed ? "neutral" : "warn"} />
                 <span className="linkish">View JSON</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Firebase Vehicle Detections History" meta={`${records.length} Firestore documents`}>
-        <Filters
-          search={search}
-          setSearch={setSearch}
-          status={status}
-          setStatus={setStatus}
-          camera=""
-          setCamera={null}
-          cameraOptions={cameras}
-          extra={
-            <select value={listed} onChange={(event) => setListed(event.target.value)} aria-label="Listed filter">
-              <option value="">Listed / non-listed</option>
-              <option value="listed">Listed</option>
-              <option value="non-listed">Non-listed</option>
-            </select>
-          }
-        />
-        {records.length === 0 ? (
-          <div className="empty-state">
-            <p>Waiting for vehicle detection documents from Firebase Firestore...</p>
-          </div>
-        ) : (
-          <div className="table vehicle-history">
-            <div className="tr th">
-              <span>Snapshot</span>
-              <span>Number Plate</span>
-              <span>Vehicle</span>
-              <span>Status</span>
-              <span>Entry Time</span>
-              <span>Exit Time</span>
-              <span>Duration</span>
-              <span>Entry Camera</span>
-              <span>Exit Camera</span>
-            </div>
-            {records.map((item) => (
-              <button key={item.id} className="tr" type="button" onClick={() => setSelected(item)}>
-                <Snapshot label="Plate" tone={item.listed ? "neutral" : "warn"} />
-                <strong className="plate">{item.plate}</strong>
-                <span>{item.vehicle}</span>
-                <StatusPill tone={item.status === "Entry" ? "ok" : "neutral"}>{item.status}</StatusPill>
-                <span>{item.entryTime}</span>
-                <span>{item.exitTime}</span>
-                <span>{item.duration}</span>
-                <span>{item.entryCamera}</span>
-                <span>{item.exitCamera}</span>
               </button>
             ))}
           </div>
